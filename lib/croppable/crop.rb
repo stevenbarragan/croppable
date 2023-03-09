@@ -4,13 +4,14 @@ require 'vips'
 module Croppable
 
   class Crop
-    def initialize(model, attr_name)
+    def initialize(model, attr_name, host:)
       @model     = model
       @attr_name = attr_name
       @data      = model.send("#{attr_name}_croppable_data")
       @setup     = model.send("#{attr_name}_croppable_setup")
       original   = model.send("#{attr_name}_original")
-      @url       = Rails.application.routes.url_helpers.rails_blob_url(original, host: Rails.application.config.asset_host)
+      asset_host = Rails.application.config.asset_host || host
+      @url       = Rails.application.routes.url_helpers.rails_blob_url(original, host: host)
     end
 
     def perform()

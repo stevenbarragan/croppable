@@ -11,7 +11,7 @@ module Croppable
           as: :croppable, inverse_of: :croppable, dependent: :destroy, class_name: "Croppable::Datum"
 
         after_commit if: -> { to_crop_croppable[name] } do
-          Croppable::CropImageJob.perform_later(self, name)
+          Croppable::CropImageJob.perform_later(self, name, host: to_crop_croppable[name][:host])
         end
 
         generated_association_methods.class_eval <<-CODE, __FILE__, __LINE__ + 1
@@ -42,7 +42,9 @@ module Croppable
                   self.#{ name }_croppable_data = Croppable::Datum.new(croppable_param.data.merge(name: "#{ name }"))
                 end
 
-                to_crop_croppable[:#{ name }] = self.#{ name }_croppable_data.updated_at_previously_changed? || self.#{ name }_croppable_data.new_record?
+                if self.#{ name }_croppable_data.updated_at_previously_changed? || self.#{ name }_croppable_data.new_record?
+                  to_crop_croppable[:#{ name }] = { host: croppable_param.host }
+                end
               end
             end
           end

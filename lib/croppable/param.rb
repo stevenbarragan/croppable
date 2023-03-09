@@ -1,10 +1,11 @@
 module Croppable
   class Param
-    attr_accessor :image, :data, :delete
+    attr_accessor :image, :data, :host, :delete
 
-    def initialize(image, data, delete: false)
+    def initialize(image, data, host:, delete: false)
       @image = image
       @delete = delete
+      @host = host
       @data  = {
         x:                data[:x],
         y:                data[:y],
